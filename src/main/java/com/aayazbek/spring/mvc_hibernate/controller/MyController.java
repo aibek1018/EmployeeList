@@ -1,17 +1,18 @@
 package com.aayazbek.spring.mvc_hibernate.controller;
 
-import com.aayazbek.spring.mvc_hibernate.dao.EmployeeDAO;
+import com.aayazbek.spring.mvc_hibernate.entity.City;
+import com.aayazbek.spring.mvc_hibernate.entity.CityDTO;
+import com.aayazbek.spring.mvc_hibernate.entity.Country;
 import com.aayazbek.spring.mvc_hibernate.entity.Employee;
-import com.aayazbek.spring.mvc_hibernate.service.EmployeeService;
+import com.aayazbek.spring.mvc_hibernate.service.city.CityService;
+import com.aayazbek.spring.mvc_hibernate.service.country.CountryService;
+import com.aayazbek.spring.mvc_hibernate.service.employee.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -19,6 +20,12 @@ public class MyController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @Autowired
+    private CityService cityService;
+
+    @Autowired
+    private CountryService countryService;
 
     @RequestMapping("/")
     public String showAllEmployees(Model model) {
@@ -35,7 +42,16 @@ public class MyController {
         Employee employee = new Employee();
         model.addAttribute("employee", employee);
 
+        List<Country> countries = countryService.getAllCountries();
+        model.addAttribute("countries", countries);
+
         return "employee-info";
+    }
+
+    @RequestMapping("/getCities")
+    public @ResponseBody
+    List<CityDTO> addNewEmployee(@RequestParam("id") int id) {
+        return cityService.findByCountry(id);
     }
 
     @RequestMapping("/saveEmployee")
@@ -43,7 +59,7 @@ public class MyController {
 
         employeeService.saveEmployee(employee);
 
-            return "redirect:/";
+        return "redirect:/";
 
     }
 
@@ -52,6 +68,12 @@ public class MyController {
 
         Employee employee = employeeService.getEmployee(id);
         model.addAttribute("employee", employee);
+
+        List<Country> countries = countryService.getAllCountries();
+        model.addAttribute("countries", countries);
+
+        List<CityDTO> cities = cityService.findByCountry(employee.getCountry().getId());
+        model.addAttribute("cities", cities);
 
         return "employee-info";
 
@@ -62,5 +84,12 @@ public class MyController {
         employeeService.deleteEmployee(id);
         return "redirect:/";
 
+    }
+
+    @RequestMapping("/search")
+    public String search(HttpServletRequest request, Model model) {
+
+        model.addAttribute("allEmps", employeeService.findBySurname(request.getParameter("surname")));
+        return "all-employees";
     }
 }

@@ -1,42 +1,12 @@
 package com.aayazbek.spring.mvc_hibernate.entity;
 
 import javax.persistence.*;
-import javax.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "employees")
 public class Employee {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
-
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "surname")
-    private String surname;
-
-    @Column(name = "middle_name")
-    private String middleName;
-
-    @Column(name = "phone_number")
-    private String phoneNumber;
-
-    @Column(name = "email")
-    private String email;
-
-    @Column(name = "country")
-    private String country;
-
-    @Column(name = "city")
-    private String city;
-
-    public Employee() {
-    }
-
-    public Employee(int id, String name, String surname, String middleName, String phoneNumber, String email, String country, String city) {
+    public Employee(int id, String name, String surname, String middleName, String phoneNumber, String email, Country country, City city) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -44,6 +14,66 @@ public class Employee {
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.country = country;
+        this.city = city;
+    }
+
+    public Employee() {
+    }
+
+    public EmployeeDTO getDTO() {
+        return new EmployeeDTO(
+                this.id,
+                this.name,
+                this.surname,
+                this.middleName,
+                this.phoneNumber,
+                this.email,
+                this.country.getName(),
+                this.city.getName()
+        );
+    }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private int id;
+
+    @Column(name = "name", length = 25)
+    private String name;
+
+    @Column(name = "surname", length = 25)
+    private String surname;
+
+    @Column(name = "middle_name", length = 25)
+    private String middleName;
+
+    @Column(name = "phone_number", length = 25)
+    private String phoneNumber;
+
+    @Column(name = "email", length = 25)
+    private String email;
+
+    @ManyToOne
+    @JoinColumn(name = "country")
+    private Country country;
+
+    @ManyToOne
+    @JoinColumn(name = "city")
+    private City city;
+
+    public Country getCountry() {
+        return country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
         this.city = city;
     }
 
@@ -95,19 +125,4 @@ public class Employee {
         this.email = email;
     }
 
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
 }
